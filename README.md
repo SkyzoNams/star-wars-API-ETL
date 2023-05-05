@@ -64,7 +64,7 @@ Finally, it calls the **sort_characters_by_height()** method to sort those chara
 
 ![alt text](/files/img/coverage.png)
 
-A complete testing suits have been implemented on the [/tests/test_star_wars_characters.py](https://github.com/SkyzoNams/star-wars-API-ETL/blob/main/tests/test_star_wars_characters.py) file using pytest.
+A complete testing suits have been implemented on the [test_star_wars_characters.py](https://github.com/SkyzoNams/star-wars-API-ETL/blob/main/tests/test_star_wars_characters.py) file using pytest.
 
 ## Docker
 You can run all the tests by executing "docker run myapp pytest" on the root folder. Please make sure the Docker image has been built first.
