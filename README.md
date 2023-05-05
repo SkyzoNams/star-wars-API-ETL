@@ -114,4 +114,4 @@ deactivate && source venv/bin/activate
 - find a way to accelerate the API calls
 
 # Time spent on the test
-- more or less 6 hours
+- 5-6 hours

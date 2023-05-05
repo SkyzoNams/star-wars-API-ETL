@@ -3,7 +3,6 @@ import requests
 import threading
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
-import time
 
 class StarWarsCharactersData():
     def __init__(self):
