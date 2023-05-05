@@ -29,6 +29,9 @@ This example will search for Transfer events from the block 13140651 to the late
 python handler.py
 ```
 
+![alt text](/files/img/process.png)
+
+
 You can deactivate the venv by doing:
 ```bash
 deactivate
