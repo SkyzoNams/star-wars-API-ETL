@@ -2,7 +2,20 @@
 The purpose of this exercise is to find the ten characters who appear in the most Star Wars films and to sort those ten characters by height in descending order (i.e.
 tallest first). Then, a CSV with the following columns: name, species, height, appearances will be send to httpbin.org
 
-# Getting Started
+# Getting Started With Docker
+1.	Clone the repo
+2.  Make sure to have Docker installed on your machine
+3.  Go inside the project root (/star-wars-API-ETL)
+4.  Build the docker application
+```bash
+docker build -t myapp .
+```
+5.  Run the python script
+```bash
+docker run -p 8080:5000 myapp
+```
+
+# Getting Started With Virtualenv
 
 1.	Clone the repo
 2.  Make sure to have Python 3 installed on your machine (developed with Python 3.7.8)
@@ -18,6 +31,11 @@ source venv/bin/activate
 6.	From the project root install all the dependencies
 ```bash
 pip install -r requirements.txt
+```
+
+You can deactivate the venv by doing:
+```bash
+deactivate
 ```
 
 # Usage

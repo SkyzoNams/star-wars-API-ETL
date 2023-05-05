@@ -9,7 +9,7 @@ class StarWarsCharactersData():
         self.star_wars_characters = []
         self.top10_sorted_character = []
         
-    def get_character_info(self, character: list):
+    def get_character_info(self, character: list) -> dict:
         """
         @Notice: Takes a character dictionary and returns a dictionary with the character's name, species, height, and number of appearances.
         @Param: character: dictionary - A dictionary containing information about a character.
@@ -33,7 +33,7 @@ class StarWarsCharactersData():
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
 
 
-    def get_top_10_characters(self, characters: list):
+    def get_top_10_characters(self, characters: list) -> list:
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
         @Param: characters: list - A list of dictionaries containing information about the characters.
@@ -44,7 +44,7 @@ class StarWarsCharactersData():
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
         return sorted_characters
 
-    def sort_characters_by_height(self, characters: list):
+    def sort_characters_by_height(self, characters: list) -> list:
         """
         @Notice: Takes a list of character dictionaries and sorts them by height in descending order.
         @Param: characters: list - A list of dictionaries containing information about the characters.
@@ -127,7 +127,7 @@ class StarWarsCharactersData():
             container[index][data_key] = data[result_key]
 
 
-    def get_star_wars_api_page(self, url: str):
+    def get_star_wars_api_page(self, url: str) -> dict:
         """
         @Notice: This method retrieves a page of Star Wars characters from the SWAPI API. 
         @Param: url: str - The URL of the page to be retrieved from the API. 
@@ -138,6 +138,7 @@ class StarWarsCharactersData():
             # Get the JSON data from the response
             data = response.json()
             return data
+
 
 
     def add_species_data_from_api(self, sorted_characters: list):
@@ -160,7 +161,7 @@ class StarWarsCharactersData():
         logging.info("the characters species have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
 
-    def sort_top10_characters_by_height(self):
+    def sort_top10_characters_by_height(self) -> list:
         """
         @Notice: This method sorts the top 10 Star Wars characters who appear in the most films by height in descending order. 
         @Return: list - A list of the top 10 Star Wars characters sorted by height in descending order. 
