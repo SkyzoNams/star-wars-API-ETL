@@ -44,6 +44,7 @@ class StarWarsCharactersData():
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
         return sorted_characters
 
+
     def sort_characters_by_height(self, characters: list) -> list:
         """
         @Notice: Takes a list of character dictionaries and sorts them by height in descending order.
@@ -54,6 +55,7 @@ class StarWarsCharactersData():
         sorted_characters = sorted(characters, key=lambda x: x["height"] or 0, reverse=True)
         logging.info("the characters have been sorted by height \x1b[32;20m✓\x1b[0m")
         return sorted_characters
+
 
     def write_csv_file(self, filename: str, fieldnames: list, data: list):
         """
@@ -138,7 +140,6 @@ class StarWarsCharactersData():
             # Get the JSON data from the response
             data = response.json()
             return data
-
 
 
     def add_species_data_from_api(self, sorted_characters: list):
