@@ -54,7 +54,11 @@ python handler.py
 
 This Python project is designed to extract information about Star Wars characters from the SWAPI (Star Wars API) and process that data. The project has several main components:
 
-The **sort_top10_characters_by_height()** method is the main method that runs the project. It calls the **get_all_star_wars_chracters()** method to get information about all the Star Wars characters using the SWAPI API. It then calls the **get_character_info()** method to get information about each character and adds that information to a list. Next, it calls the **get_top_10_characters()** method to get the top 10 characters who appear in the most films. Finally, it calls the **sort_characters_by_height()** method to sort those characters by height in descending order, adds the species data to the sorted character list with the add_species_data() method, creates a CSV file with the **create_and_send_csv()** method, and sends that file to a server with the **send_csv_file_to_server()** method.
+The **sort_top10_characters_by_height()** method is the main method that runs the project. It calls the **get_all_star_wars_chracters()** method to get information about all the Star Wars characters using the SWAPI API. It then calls the **get_character_info()** method to get information about each character and adds that information to a list. 
+
+Next, it calls the **get_top_10_characters()** method to get the top 10 characters who appear in the most films. 
+
+Finally, it calls the **sort_characters_by_height()** method to sort those characters by height in descending order, adds the species data to the sorted character list with the add_species_data() method, creates a CSV file with the **create_and_send_csv()** method, and sends that file to a server with the **send_csv_file_to_server()** method.
 
 # Testing
 
