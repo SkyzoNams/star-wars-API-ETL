@@ -107,7 +107,6 @@ class StarWarsCharactersData():
             thread.start()
             threads.append(thread)
             page += 1
-            
         # Wait for all the threads to finish
         for thread in threads:
             thread.join()
@@ -195,4 +194,4 @@ class StarWarsCharactersData():
         self.write_csv_file(csv_filename, csv_fieldnames, sorted_characters)
 
         # Send the CSV file
-        self.send_csv_file_to_server(csv_filename, "https://httpbin.org/")
+        self.send_csv_file_to_server(csv_filename, "https://httpbin.org/post")
