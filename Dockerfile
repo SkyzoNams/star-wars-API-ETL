@@ -3,3 +3,4 @@ ADD . /app
 WORKDIR /app
 RUN pip install -r requirements.txt
 CMD ["python", "handler.py"]
+CMD ["pytest"]
