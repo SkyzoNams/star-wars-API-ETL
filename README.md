@@ -85,7 +85,6 @@ deactivate && source venv/bin/activate
 
 # Functions
 
-
 **StarWarsCharactersData** class: This class contains several methods that extract, process, and output Star Wars character data.
 
 **get_character_info()** method: This method takes a character dictionary and returns a dictionary with the character's name, species, height, and number of appearances.

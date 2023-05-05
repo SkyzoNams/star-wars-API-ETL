@@ -191,5 +191,5 @@ class StarWarsCharactersData():
         csv_fieldnames = ["name", "species", "height", "appearances"]
         self.write_csv_file(csv_filename, csv_fieldnames, sorted_characters)
 
-        # Send the CSV file to httpbin.org
+        # Send the CSV file
         self.send_csv_file_to_server(csv_filename, "https://httpbin.org/post")
