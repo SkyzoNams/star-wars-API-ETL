@@ -10,10 +10,6 @@ tallest first). Then, a CSV with the following columns: name, species, height, a
 ```bash
 docker build -t myapp .
 ```
-5.  Run the python script
-```bash
-docker run myapp handler.py
-```
 
 # Getting started with virtualenv
 
