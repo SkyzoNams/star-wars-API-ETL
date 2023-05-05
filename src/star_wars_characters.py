@@ -98,6 +98,7 @@ class StarWarsCharactersData():
         @Notice: This method gets information about all the Star Wars characters using the SWAPI API using multi theading.
             The results is stored into the star_wars_characters class variable.
         """
+        logging.info('searching for Star Wars characters data through the api...')
         url = "https://swapi.dev/api/people/?page="
         page = 0
         threads = []
@@ -110,7 +111,7 @@ class StarWarsCharactersData():
         # Wait for all the threads to finish
         for thread in threads:
             thread.join()
-        logging.info("all the star wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
+        logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
     
     def agregate_api_results(self, data: dict, container, result_key: str, index=None, data_key=None):
@@ -149,6 +150,7 @@ class StarWarsCharactersData():
         @Param: sorted_characters: list - A list of Star Wars characters to which species data will be added. 
         """
         threads = []
+        logging.info('searching for Star Wars characters species through the api...')
         for index, character in enumerate(sorted_characters):
             self.top10_sorted_character.append(character)
             if character['species'] != "":
@@ -193,4 +195,4 @@ class StarWarsCharactersData():
         self.write_csv_file(csv_filename, csv_fieldnames, sorted_characters)
 
         # Send the CSV file
-        self.send_csv_file_to_server(csv_filename, "https://httpbin.org/post")
+        self.send_csv_file_to_server(csv_filename, "https://httpbin.org/")
