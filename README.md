@@ -56,6 +56,8 @@ get_star_wars_api_page() method: This method takes a URL for a page of character
 
 add_species_data() method: This method adds the species data to the sorted character list.
 
+agregate_api_results() method: This method aggregates API results into a container.
+
 sort_top10_characters_by_height() method: This method sorts the top 10 Star Wars characters who appear in the most films by height in descending order.
 
 create_and_send_csv() method: This method creates a CSV file in the /files folder and sends it to a server using the send_csv_file_to_server() method.
@@ -63,6 +65,8 @@ create_and_send_csv() method: This method creates a CSV file in the /files folde
 The sort_top10_characters_by_height() method is the main method that runs the project. It calls the get_all_star_wars_chracters() method to get information about all the Star Wars characters using the SWAPI API. It then calls the get_character_info() method to get information about each character and adds that information to a list. Next, it calls the get_top_10_characters() method to get the top 10 characters who appear in the most films. Finally, it calls the sort_characters_by_height() method to sort those characters by height in descending order, adds the species data to the sorted character list with the add_species_data() method, creates a CSV file with the create_and_send_csv() method, and sends that file to a server with the send_csv_file_to_server() method.
 
 # Testing
+
+![alt text](/files/img/coverage.png)
 
 A complete testing suits have been implemented on the /tests/test_star_wars_characters.py ([here](https://github.com/SkyzoNams/star-wars-API-ETL/tests/test_star_wars_characters.py)) file using pytest.
 
@@ -76,8 +80,9 @@ If the venv dependencies have just been installed, you should deactivate and act
 deactivate && source venv/bin/activate
 ```
 
-# Improvements
-aaaa
+# Possible improvements
+- going deeper on tests
+- find a way to accelerate the API calls
 
 # Time spent on the test
-aaaa
+more or less 6 hours

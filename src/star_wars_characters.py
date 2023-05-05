@@ -5,6 +5,7 @@ import threading
 class StarWarsCharactersData():
     def __init__(self):
         self.star_wars_characters = []
+        self.top10_sorted_character = []
         
     def get_character_info(self, character):
         """
@@ -19,7 +20,7 @@ class StarWarsCharactersData():
 
         # Get the character's height (if defined)
         height = None # If height is not defined, set it to None
-        if character["height"].isdigit():
+        if character["height"] and character["height"].isdigit():
             height = int(character["height"])  # Convert height to an integer if it is a string of digits
             
         # Get the number of films the character appears in
@@ -74,27 +75,28 @@ class StarWarsCharactersData():
         @Dev: This method sends a CSV file to a server endpoint via POST method
         @Param: filename: str - The name of the CSV file to be sent.
                 server_url: str - The URL of the server endpoint to send the file to.
-        @Return: None
+        @Return: The post method response
         """
         # Open the CSV file in binary mode and create a dictionary with the file contents
         with open(filename, "rb") as csvfile:
             files = {"file": csvfile}
-
             # Send the file to the server using the requests library
             response = requests.post(server_url, files=files)
             # Print the server's response content
             print(response.content.decode())
+        return response
             
             
     def get_all_star_wars_characters(self):
         """
-        @Notice: This method gets information about all the Star Wars characters using the SWAPI API. 
+        @Notice: This method gets information about all the Star Wars characters using the SWAPI API using multi theading.
+            The results is stored into the star_wars_characters class variable.
         """
         url = "https://swapi.dev/api/people/?page="
         page = 0
         threads = []
         while page < 9:
-            thread = threading.Thread(target=self.get_star_wars_api_page, args=(url + str(page + 1), ))
+            thread = threading.Thread(target=self.agregate_api_results, args=(self.get_star_wars_api_page(url + str(page + 1)), self.star_wars_characters, "results"))
             thread.start()
             threads.append(thread)
             page += 1
@@ -102,7 +104,23 @@ class StarWarsCharactersData():
         # Wait for all the threads to finish
         for thread in threads:
             thread.join()
-        
+
+    
+    def agregate_api_results(self, data, container, result_key, index=None, data_key=None):
+        """
+        @Notice: This function aggregates API results into a container by extracting the 'result_key' from the 'data' and 
+                appending it to 'container' or updating it at a specific 'index' and 'data_key'.
+        @Param data: The data obtained from an API request.
+        @Param container: The container where the data will be stored.
+        @Param result_key: The key in the 'data' dictionary that contains the desired results.
+        @Param index: (optional) The index of the 'container' list where the data will be updated.
+        @Param data_key: (optional) The key in the 'container' list where the data will be updated.
+        """
+        if index is None:
+            container += data[result_key]
+        else:
+            container[index][data_key] = data[result_key]
+
 
     def get_star_wars_api_page(self, url):
         """
@@ -114,24 +132,23 @@ class StarWarsCharactersData():
         if response.status_code == 200:
             # Get the JSON data from the response
             data = response.json()
-            self.star_wars_characters += data['results']
+            return data
 
 
-    def add_species_data(self, sorted_characters):
+    def add_species_data_from_api(self, sorted_characters):
         """
-        @Notice: This method adds species data to a list of Star Wars characters. 
+        @Notice: This method adds species data to a list of Star Wars characters using multi threading.
+            Results will be store into the class variable top10_sorted_character.
         @Param: sorted_characters: list - A list of Star Wars characters to which species data will be added. 
-        @Return: list - The list of Star Wars characters with added species data. 
         """
-        for character in sorted_characters:
+        threads = []
+        for index, character in enumerate(sorted_characters):
+            self.top10_sorted_character.append(character)
             if character['species'] != "":
-                response = requests.get(character['species'])
-                if response.status_code == 200:
-                    # Get the JSON data from the response
-                    data = response.json()
-                    character['species'] = data['name']
-        return sorted_characters
-
+                thread = threading.Thread(target=self.agregate_api_results, args=(self.get_star_wars_api_page(character['species']), self.top10_sorted_character, "name", index, "species"))
+                thread.start()
+                threads.append(thread)
+    
 
     def sort_top10_characters_by_height(self):
         """
@@ -144,13 +161,13 @@ class StarWarsCharactersData():
         for character in self.star_wars_characters:
             # Get information about the character
             characters_info.append(self.get_character_info(character))
+            
         # Get the top 10 characters who appear in the most films
         top_10_characters = self.get_top_10_characters(characters_info)
         # Sort the top 10 characters by height in descending order
         sorted_characters = self.sort_characters_by_height(top_10_characters)
-        sorted_characters = self.add_species_data(sorted_characters)
-        print(sorted_characters)
-        return sorted_characters
+        self.add_species_data_from_api(sorted_characters)
+        return self.top10_sorted_character
 
 
     def create_and_send_csv(self, sorted_characters):
@@ -159,7 +176,7 @@ class StarWarsCharactersData():
         @Param: sorted_characters: list - A list of Star Wars characters to be included in the CSV file. 
         """
         # Create the CSV file
-        csv_filename = "./files/star_wars_top10_characters_sorted_by_height.csv"
+        csv_filename = "./files/csv/star_wars_top10_characters_sorted_by_height.csv"
         csv_fieldnames = ["name", "species", "height", "appearances"]
         self.write_csv_file(csv_filename, csv_fieldnames, sorted_characters)
 

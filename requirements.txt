@@ -1,0 +1,5 @@
+certifi==2022.12.7
+requests==2.5.0
+six==1.8.0
+ujson==1.33
+urllib3==2.0.2

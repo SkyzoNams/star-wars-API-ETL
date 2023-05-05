@@ -1,6 +1,5 @@
 from src.star_wars_characters import StarWarsCharactersData
 
-
 def main():
     try:
         st_data = StarWarsCharactersData() # create an instance of StarWarsCharactersData
