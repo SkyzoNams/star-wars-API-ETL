@@ -89,10 +89,12 @@ class StarWarsCharactersData():
             files = {"file": csvfile}
             # Send the file to the server using the requests library
             response = requests.post(server_url, files=files)
-        if response.status_code == 200:
-            logging.info("csv file sent to " + server_url + " \x1b[32;20m✓\x1b[0m")
-        else:
-            logging.error("the csv file has not be sent. Error code: " + str(response.status_code) + " \x1b[31;20m✗\x1b[0m")
+            try:
+                response.raise_for_status()
+                logging.info("csv file sent to " + server_url + " \x1b[32;20m✓\x1b[0m")
+            except requests.exceptions.HTTPError as error:
+                logging.error("\033[31m" + "the csv file has not been sent" + "\033[0m")
+                raise error
         return response
             
             
@@ -143,6 +145,8 @@ class StarWarsCharactersData():
             # Get the JSON data from the response
             data = response.json()
             return data
+        else:
+            logging.warning("\033[33m"+ "there is not data for the endpoint " + url + "\033[0m")
 
 
     def add_species_data_from_api(self, sorted_characters: list):
