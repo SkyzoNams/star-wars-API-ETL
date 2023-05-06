@@ -89,7 +89,10 @@ class StarWarsCharactersData():
             files = {"file": csvfile}
             # Send the file to the server using the requests library
             response = requests.post(server_url, files=files)
-        logging.info("csv file sent to " + server_url + " \x1b[32;20m✓\x1b[0m")
+        if response.status_code == 200:
+            logging.info("csv file sent to " + server_url + " \x1b[32;20m✓\x1b[0m")
+        else:
+            logging.error("the csv file has not be sent. Error code: " + str(response.status_code) + " \x1b[31;20m✗\x1b[0m")
         return response
             
             
