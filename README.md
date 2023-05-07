@@ -2,6 +2,8 @@
 The purpose of this exercise is to find the ten characters who appear in the most Star Wars films and to sort those ten characters by height in descending order (i.e.
 tallest first). Then, a CSV with the following columns: name, species, height, appearances will be send to httpbin.org
 
+This program has been implemented to work if new Star Wars films are .
+
 # Getting started with Docker
 1.	Clone the repo
 2.  Make sure to have Docker installed on your machine

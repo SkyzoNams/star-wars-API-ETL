@@ -1,13 +1,14 @@
 import csv
 import requests
-import threading
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
+import concurrent.futures
+import time
 
 class StarWarsCharactersData():
     def __init__(self):
         self.star_wars_characters = []
-        self.top10_sorted_character = []
+        self.species = []
         
     def get_character_info(self, character: list) -> dict:
         """
@@ -21,7 +22,7 @@ class StarWarsCharactersData():
             species = character["species"][0]
 
         # Get the character's height (if defined)
-        height = None # If height is not defined, set it to None
+        height = 0 # If height is not defined, set it to None
         if character["height"] and character["height"].isdigit():
             height = int(character["height"])  # Convert height to an integer if it is a string of digits
             
@@ -33,16 +34,50 @@ class StarWarsCharactersData():
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
 
 
-    def get_top_10_characters(self, characters: list) -> list:
+    def get_top_n_characters(self, characters: list, limit=10) -> list:
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
         @Param: characters: list - A list of dictionaries containing information about the characters.
-        @Return: A list containing the top 10 characters who appear in the most films.
+        @Param: limit: int - The number of items to sort and return.
+        @Return: A list containing the top X characters who appear in the most films.
         """
         # Sort the characters by the number of appearances (in descending order) and return the top 10
-        sorted_characters = sorted(characters, key=lambda x: x["appearances"], reverse=True)[:10]
+        sorted_characters = sorted(characters, key=lambda x: x["appearances"], reverse=True)[:limit]
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
         return sorted_characters
+
+    
+    def sort_tallest_first_when_equal_appearances_for_last_items(self, characters):
+        """        
+        @Notice: Keep only the tallest character for each number of appearances among the characters with the same number of appearances, from the 10th character on the list.
+        @Param characters: A list of dictionaries representing characters with their attributes.
+        @Return: The modified 'characters' list.
+        """
+        if len(characters) > 10:
+            appearances = characters[9]['appearances'] # The 10th item appearances number
+            index = 9 # From the 10th item
+            for character in reversed(characters[:8]):
+                if character["appearances"] != appearances: # If the character above has not the same appearances value
+                    break 
+                index -= 1
+                
+            items_number = 10 - index # The number of items with equal apperances
+            # Filter the characters list to only include those with the same number of appearances as the 10th character.
+            list_with_same_appearances = list(filter(lambda x: x['appearances'] == appearances, characters))
+            
+            # Find the tallest character for each number of appearances among the characters with the same number of appearances
+            # and keep only the tallest for each number of appearances.
+            tallest_with_same_apperances = list(map(lambda n: sorted(list(filter(lambda x: x['appearances'] == n, list_with_same_appearances)), key=lambda y: y['height'], reverse=True)[:items_number], set(x['appearances'] for x in list_with_same_appearances)))[0]
+            
+            # Replace the original list's last characters with the tallest character of the same appearances.
+            result_index = 0
+            while index <= 9:
+                characters[index] = tallest_with_same_apperances[result_index]
+                index += 1
+                result_index += 1
+                
+            logging.info("we found and kept the tallest character with " + str(appearances) + " appearances \x1b[32;20m✓\x1b[0m")
+        return characters
 
 
     def sort_characters_by_height(self, characters: list) -> list:
@@ -84,6 +119,7 @@ class StarWarsCharactersData():
                 server_url: str - The URL of the server endpoint to send the file to.
         @Return: The post method response
         """
+        logging.info("sending the csv file to + " + server_url + "...")
         # Open the CSV file in binary mode and create a dictionary with the file contents
         with open(filename, "rb") as csvfile:
             files = {"file": csvfile}
@@ -97,32 +133,8 @@ class StarWarsCharactersData():
                 raise error
         return response
             
-            
-    def get_all_star_wars_characters(self, starting_page=0, ending_page=9):
-        """
-        @Notice: This method gets information about all the Star Wars characters using the SWAPI API using multi theading.
-            The results is stored into the star_wars_characters class variable.
-        """
-        logging.info('searching for Star Wars characters data through the api...')
-        url = "https://swapi.dev/api/people/?page="
-        page = starting_page
-        threads = []
-        while page < ending_page: # The actual number of pages
-            thread = threading.Thread(target=self.agregate_api_results, args=(self.get_star_wars_api_page(url + str(page + 1)), self.star_wars_characters, "results"))
-            thread.start()
-            threads.append(thread)
-            page += 1
-        # Wait for all the threads to finish
-        for thread in threads:
-            thread.join()
-        # Search for eventual new characters page (in case of new Star Wars)
-        next_pages = [p['next_page'] for p in self.star_wars_characters if 'next_page' in p]
-        if None not in next_pages:
-            self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
-        logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
-
     
-    def agregate_api_results(self, data: dict, container, result_key: str, index=None, data_key=None):
+    def agregate_api_results(self, data: dict, container, api_endpoint: str):
         """
         @Notice: This function aggregates API results into a container by extracting the 'result_key' from the 'data' and 
                 appending it to 'container' or updating it at a specific 'index' and 'data_key'.
@@ -132,12 +144,12 @@ class StarWarsCharactersData():
         @Param index: (optional) The index of the 'container' list where the data will be updated.
         @Param data_key: (optional) The key in the 'container' list where the data will be updated.
         """
-        if index is None:
+        if api_endpoint == "people":
             if 'next' in data:
-                data[result_key][0]['next_page'] = data["next"]
-            container += data[result_key]
-        else:
-            container[index][data_key] = data[result_key]
+                data["results"][0]['next_page'] = data["next"]
+            container += data["results"]
+        elif api_endpoint == 'species':
+            container.append(data)
 
 
     def get_star_wars_api_page(self, url: str) -> dict:
@@ -155,26 +167,74 @@ class StarWarsCharactersData():
             logging.warning("\033[33m"+ "there is not data for the endpoint " + url + "\033[0m")
 
 
-    def add_species_data_from_api(self, sorted_characters: list):
+    def get_all_star_wars_characters(self, starting_page=0, ending_page=9):
         """
-        @Notice: This method adds species data to a list of Star Wars characters using multi threading.
-            Results will be store into the class variable top10_sorted_character.
-        @Param: sorted_characters: list - A list of Star Wars characters to which species data will be added. 
+        @Notice: This function retrieves Star Wars character data from an API by calling a separate function, get_star_wars_api_page, and aggregates the results.
+        @Param starting_page: int, optional. The page number to start the search from.
+        @Param ending_page: int, optional. The page number to end the search at.
+        @Return: None
         """
-        threads = []
-        logging.info('searching for Star Wars characters species through the api...')
-        for index, character in enumerate(sorted_characters):
-            self.top10_sorted_character.append(character)
-            if character['species'] != "":
-                thread = threading.Thread(target=self.agregate_api_results, args=(self.get_star_wars_api_page(character['species']), self.top10_sorted_character, "name", index, "species"))
-                thread.start()
-                threads.append(thread)
-        
-        # Wait for all the threads to finish
-        for thread in threads:
-            thread.join()
-        logging.info("the characters species have been retrieved from the api \x1b[32;20m✓\x1b[0m")
+        logging.info('searching for Star Wars characters data through the api...')
+        url = "https://swapi.dev/api/people/?page="
+        page = starting_page
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            while page < ending_page:
+                # Submit the API request to a thread pool
+                future = executor.submit(self.get_star_wars_api_page, url + str(page + 1))
+                # Add a callback to aggregate the results
+                future.add_done_callback(lambda f: self.agregate_api_results(f.result(), self.star_wars_characters, "people"))
+                page += 1
+        # Wait for all threads to finish before exiting
+        executor.shutdown(wait=True)
+        # Check if there are additional pages to search
+        next_pages = [p['next_page'] for p in self.star_wars_characters if 'next_page' in p]
+        if None not in next_pages:
+            # Recursive call to retrieve the next page
+            self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
+        time.sleep(0.5)
+        logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
+
+    def add_species_data_from_api(self, characters: list):
+        """
+        @Notice: This function retrieves Star Wars character species data from an API by calling a separate function, get_star_wars_api_page, and adds it to the provided list of sorted characters.
+        @Param sorted_characters: list. The list of characters to add species data to.
+        @Return: None
+        """
+        logging.info('searching for Star Wars characters species through the api...')
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            for character in characters:
+                if character['species'] != "":
+                    # Submit the API request to a thread pool
+                    future = executor.submit(self.get_star_wars_api_page, character['species'])
+                    # Add a callback to aggregate the results
+                    future.add_done_callback(lambda f: self.agregate_api_results(f.result(), self.species, "species"))
+                    
+        # Wait for all threads to finish before exiting
+        executor.shutdown(wait=True)
+        characters = self.retrieve_species_from_url(characters)
+        time.sleep(0.3)
+        logging.info("the characters species have been retrieved from the api \x1b[32;20m✓\x1b[0m")
+        return characters
+
+
+    def retrieve_species_from_url(self, sorted_characters):
+        """
+        @Notice Retrieves the species name for each character in the input list of dictionaries by matching their species URL 
+        with the corresponding URL in the 'species' list.
+        @Param sorted_characters: A list of dictionaries, where each dictionary represents a character and contains a 'species' key
+                                with a URL value.
+        @Return: The updated list of dictionaries, where the 'species' key of each character dictionary now contains the 
+                corresponding species name instead of the URL.
+        """
+        for character in sorted_characters:
+            if character['species']:
+                # Filters the 'species' list to get the dictionary that has a URL key matching the 'species' URL of the character
+                # and assigns the corresponding species name to the 'species' key of the character dictionary.
+                single_species = list(filter(lambda d: d['url'] == character['species'], self.species))[0]
+                character['species'] = single_species['name']
+        return sorted_characters
+        
 
     def sort_top10_characters_by_height(self) -> list:
         """
@@ -186,14 +246,17 @@ class StarWarsCharactersData():
         characters_info = []
         for character in self.star_wars_characters:
             # Get information about the character
-            characters_info.append(self.get_character_info(character))
-            
+            characters_info.append(self.get_character_info(character))      
+        # Get the top 20 characters who appear in the most films
+        top_20_characters = self.get_top_n_characters(characters_info, 20)
+        # Keep only in the list the tallest character when there is equal apperances
+        top_20_characters = self.sort_tallest_first_when_equal_appearances_for_last_items(top_20_characters)  
         # Get the top 10 characters who appear in the most films
-        top_10_characters = self.get_top_10_characters(characters_info)
+        top_10_characters = self.get_top_n_characters(top_20_characters, 10)
         # Sort the top 10 characters by height in descending order
         sorted_characters = self.sort_characters_by_height(top_10_characters)
-        self.add_species_data_from_api(sorted_characters)
-        return self.top10_sorted_character
+        top10_sorted_character = self.add_species_data_from_api(sorted_characters)
+        return top10_sorted_character
 
 
     def create_and_send_csv(self, sorted_characters: list):
