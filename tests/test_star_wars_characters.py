@@ -214,18 +214,18 @@ def test_get_character_info_with_empty_films_list(character, star_wars_character
 def test_get_top_10_characters_returns_list(characters, star_wars_characters_data):
     for character in characters:
         character['appearances'] = len(character['films'])
-    assert isinstance(star_wars_characters_data.get_top_n_characters(characters), list)
+    assert isinstance(star_wars_characters_data.get_top_n_characters_by_appearances(characters), list)
 
 def test_get_top_10_characters_returns_10_characters(characters, star_wars_characters_data):
     for character in characters:
         character['appearances'] = len(character['films'])
-    assert len(star_wars_characters_data.get_top_n_characters(characters)) == 10
+    assert len(star_wars_characters_data.get_top_n_characters_by_appearances(characters)) == 10
 
 def test_get_top_10_characters_returns_correct_order(characters, star_wars_characters_data):
     expected_order = ['Luke Skywalker', 'Darth Vader', 'Chewbacca', 'Leia Organa', 'Han Solo', 'Count Dooku', 'Yoda', 'Obi-Wan Kenobi', 'Anakin Skywalker', 'Mace Windu']
     for character in characters:
         character['appearances'] = len(character['films'])
-    assert [c["name"] for c in star_wars_characters_data.get_top_n_characters(characters)] == expected_order
+    assert [c["name"] for c in star_wars_characters_data.get_top_n_characters_by_appearances(characters)] == expected_order
 
 def test_sort_characters_by_height(characters, star_wars_characters_data):
     # Test sorting characters by height in descending order

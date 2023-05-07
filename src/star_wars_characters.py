@@ -34,7 +34,7 @@ class StarWarsCharactersData():
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
 
 
-    def get_top_n_characters(self, characters: list, limit=10) -> list:
+    def get_top_n_characters_by_appearances(self, characters: list, limit=10) -> list:
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
         @Param: characters: list - A list of dictionaries containing information about the characters.
@@ -248,7 +248,7 @@ class StarWarsCharactersData():
             characters_info.append(self.get_character_info(character))    
               
         # Get the top 20 characters who appear in the most films
-        top_20_characters = self.get_top_n_characters(characters_info, 20)
+        top_20_characters = self.get_top_n_characters_by_appearances(characters_info, 20)
         # Keep only in the list the tallest character when there is equal apperances (only for the last items)
         top_20_characters = self.sort_tallest_first_when_equal_appearances_for_last_items(top_20_characters)  
         # Sort the top 10 characters by height in descending order
