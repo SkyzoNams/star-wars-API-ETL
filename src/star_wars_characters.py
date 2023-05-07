@@ -213,7 +213,6 @@ class StarWarsCharactersData():
         # Wait for all threads to finish before exiting
         executor.shutdown(wait=True)
         characters = self.retrieve_species_from_url(characters)
-        time.sleep(0.3)
         logging.info("the characters species have been retrieved from the api \x1b[32;20m✓\x1b[0m")
         return characters
 
@@ -246,15 +245,14 @@ class StarWarsCharactersData():
         characters_info = []
         for character in self.star_wars_characters:
             # Get information about the character
-            characters_info.append(self.get_character_info(character))      
+            characters_info.append(self.get_character_info(character))    
+              
         # Get the top 20 characters who appear in the most films
         top_20_characters = self.get_top_n_characters(characters_info, 20)
-        # Keep only in the list the tallest character when there is equal apperances
+        # Keep only in the list the tallest character when there is equal apperances (only for the last items)
         top_20_characters = self.sort_tallest_first_when_equal_appearances_for_last_items(top_20_characters)  
-        # Get the top 10 characters who appear in the most films
-        top_10_characters = self.get_top_n_characters(top_20_characters, 10)
         # Sort the top 10 characters by height in descending order
-        sorted_characters = self.sort_characters_by_height(top_10_characters)
+        sorted_characters = self.sort_characters_by_height(top_20_characters[:10]) # Only sort the 10 first
         top10_sorted_character = self.add_species_data_from_api(sorted_characters)
         return top10_sorted_character
 
