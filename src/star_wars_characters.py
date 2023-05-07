@@ -140,9 +140,7 @@ class StarWarsCharactersData():
                 appending it to 'container' or updating it at a specific 'index' and 'data_key'.
         @Param data: The data obtained from an API request.
         @Param container: The container where the data will be stored.
-        @Param result_key: The key in the 'data' dictionary that contains the desired results.
-        @Param index: (optional) The index of the 'container' list where the data will be updated.
-        @Param data_key: (optional) The key in the 'container' list where the data will be updated.
+        @Param api_endpoint: The api endpoint in order to know which request is processed.
         """
         if api_endpoint == "people":
             if 'next' in data:
@@ -172,7 +170,6 @@ class StarWarsCharactersData():
         @Notice: This function retrieves Star Wars character data from an API by calling a separate function, get_star_wars_api_page, and aggregates the results.
         @Param starting_page: int, optional. The page number to start the search from.
         @Param ending_page: int, optional. The page number to end the search at.
-        @Return: None
         """
         logging.info('searching for Star Wars characters data through the api...')
         url = "https://swapi.dev/api/people/?page="
@@ -199,7 +196,6 @@ class StarWarsCharactersData():
         """
         @Notice: This function retrieves Star Wars character species data from an API by calling a separate function, get_star_wars_api_page, and adds it to the provided list of sorted characters.
         @Param sorted_characters: list. The list of characters to add species data to.
-        @Return: None
         """
         logging.info('searching for Star Wars characters species through the api...')
         with concurrent.futures.ThreadPoolExecutor() as executor:

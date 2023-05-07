@@ -91,7 +91,7 @@ deactivate && source venv/bin/activate
 
 **get_character_info()** method: This method takes a character dictionary and returns a dictionary with the character's name, species, height, and number of appearances.
 
-**get_top_10_characters()** method: This method takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
+**get_top_n_characters_by_appearances()** method: This method takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
 
 **sort_characters_by_height()** method: This method takes a list of character dictionaries and sorts them by height in descending order.
 
@@ -103,13 +103,17 @@ deactivate && source venv/bin/activate
 
 **get_star_wars_api_page()** method: This method takes a URL for a page of character data from the SWAPI API and returns the JSON data for that page.
 
-**add_species_data()** method: This method adds the species data to the sorted character list.
+**add_species_data_from_api()** method: This method adds the species data to the sorted character list.
 
 **agregate_api_results()** method: This method aggregates API results into a container.
 
 **sort_top10_characters_by_height()** method: This method sorts the top 10 Star Wars characters who appear in the most films by height in descending order.
 
 **create_and_send_csv()** method: This method creates a CSV file in the /files folder and sends it to a server using the send_csv_file_to_server() method.
+
+**sort_tallest_first_when_equal_appearances_for_last_items()** method: Keep only the tallest character for each number of appearances among the characters with the same number of appearances, from the 10th character on the list.
+
+**retrieve_species_from_url()** method: Retrieves the species name for each character in the input list of dictionaries by matching their species URL with the corresponding URL in the 'species' list.
 
 # Possible improvements
 - going deeper on tests
