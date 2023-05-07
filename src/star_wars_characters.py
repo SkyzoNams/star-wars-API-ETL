@@ -3,7 +3,6 @@ import requests
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
 import concurrent.futures
-import time
 
 class StarWarsCharactersData():
     def __init__(self):
@@ -42,7 +41,7 @@ class StarWarsCharactersData():
         @Return: A list containing the top X characters who appear in the most films.
         """
         # Sort the characters by the number of appearances (in descending order) and return the top 10
-        sorted_characters = sorted(characters, key=lambda x: x["appearances"], reverse=True)[:limit]
+        sorted_characters = sorted(characters, key=lambda x: x["appearances"], reverse=True)[:limit] # this line is causing some inconsistency one every 100 test replaceing Ki-Adi-Mundi by Nute Gunray
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
         return sorted_characters
 
@@ -53,30 +52,28 @@ class StarWarsCharactersData():
         @Param characters: A list of dictionaries representing characters with their attributes.
         @Return: The modified 'characters' list.
         """
-        if len(characters) > 10:
-            appearances = characters[9]['appearances'] # The 10th item appearances number
-            index = 9 # From the 10th item
-            for character in reversed(characters[:8]):
-                if character["appearances"] != appearances: # If the character above has not the same appearances value
-                    break 
-                index -= 1
-                
-            items_number = 10 - index # The number of items with equal apperances
-            # Filter the characters list to only include those with the same number of appearances as the 10th character.
-            list_with_same_appearances = list(filter(lambda x: x['appearances'] == appearances, characters))
-            
-            # Find the tallest character for each number of appearances among the characters with the same number of appearances
-            # and keep only the tallest for each number of appearances.
-            tallest_with_same_apperances = list(map(lambda n: sorted(list(filter(lambda x: x['appearances'] == n, list_with_same_appearances)), key=lambda y: y['height'], reverse=True)[:items_number], set(x['appearances'] for x in list_with_same_appearances)))[0]
-            
-            # Replace the original list's last characters with the tallest character of the same appearances.
-            result_index = 0
-            while index <= 9:
-                characters[index] = tallest_with_same_apperances[result_index]
-                index += 1
-                result_index += 1
-                
-            logging.info("we found and kept the tallest character with " + str(appearances) + " appearances \x1b[32;20m✓\x1b[0m")
+        if len(characters) <= 10: # if there are less than 10 items in the list, return the original list
+            return characters
+        
+        appearances = characters[9]['appearances'] # Get the appearances of the 10th item in the list
+        # Calculate the number of items to keep by finding the first item from the 9th item and backwards with a different appearances value
+        items_number = 9 - next(i for i, c in enumerate(characters[8::-1]) if c['appearances'] != appearances)
+        # Filter the input list to only keep the characters with the same appearances value
+        list_with_same_appearances = [c for c in characters if c['appearances'] == appearances]
+        # Find the tallest character for this number of appearances among the characters with the same number of appearances
+        tallest_with_same_appearances = [
+            sorted([c for c in list_with_same_appearances if c['appearances'] == n], key=lambda x: x['height'], reverse=True)[:items_number]
+            for n in set(c['appearances'] for c in list_with_same_appearances)
+        ]
+
+        # Replace the original list's last characters with the tallest characters of the same appearances.
+        index = 0
+        while items_number <= 9:
+            characters[items_number] = tallest_with_same_appearances[0][index]
+            items_number += 1
+            index += 1
+
+        logging.info("we found and kept the tallest character with " + str(appearances) + " appearances \x1b[32;20m✓\x1b[0m")
         return characters
 
 
@@ -188,7 +185,6 @@ class StarWarsCharactersData():
         if None not in next_pages:
             # Recursive call to retrieve the next page
             self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
-        time.sleep(0.5)
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
 
@@ -240,16 +236,16 @@ class StarWarsCharactersData():
         self.get_all_star_wars_characters()
         characters_info = []
         for character in self.star_wars_characters:
-            # Get information about the character
+            # Get digestible information about the character
             characters_info.append(self.get_character_info(character))    
               
         # Get the top 20 characters who appear in the most films
         top_20_characters = self.get_top_n_characters_by_appearances(characters_info, 20)
-        # Keep only in the list the tallest character when there is equal apperances (only for the last items)
+        # Keep only in the list the tallest character when there is equal appearances (only for the last items)
         top_20_characters = self.sort_tallest_first_when_equal_appearances_for_last_items(top_20_characters)  
         # Sort the top 10 characters by height in descending order
-        sorted_characters = self.sort_characters_by_height(top_20_characters[:10]) # Only sort the 10 first
-        top10_sorted_character = self.add_species_data_from_api(sorted_characters)
+        top10_sorted_character = self.sort_characters_by_height(top_20_characters[:10]) # Only sort the 10 first
+        top10_sorted_character = self.add_species_data_from_api(top10_sorted_character)
         return top10_sorted_character
 
 
