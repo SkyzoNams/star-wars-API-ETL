@@ -64,7 +64,7 @@ Finally, it calls the **sort_characters_by_height()** method to sort those chara
 
 # Testing
 
-![alt text](/files/img/coverage1.png)
+![alt text](/files/img/coverage2.png)
 
 A complete testing suits have been implemented on the [test_star_wars_characters.py](https://github.com/SkyzoNams/star-wars-API-ETL/blob/main/tests/test_star_wars_characters.py) file using pytest.
 
