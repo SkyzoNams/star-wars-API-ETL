@@ -98,16 +98,16 @@ class StarWarsCharactersData():
         return response
             
             
-    def get_all_star_wars_characters(self):
+    def get_all_star_wars_characters(self, starting_page=0, ending_page=9):
         """
         @Notice: This method gets information about all the Star Wars characters using the SWAPI API using multi theading.
             The results is stored into the star_wars_characters class variable.
         """
         logging.info('searching for Star Wars characters data through the api...')
         url = "https://swapi.dev/api/people/?page="
-        page = 0
+        page = starting_page
         threads = []
-        while page < 9:
+        while page < ending_page: # The actual number of pages
             thread = threading.Thread(target=self.agregate_api_results, args=(self.get_star_wars_api_page(url + str(page + 1)), self.star_wars_characters, "results"))
             thread.start()
             threads.append(thread)
@@ -115,6 +115,10 @@ class StarWarsCharactersData():
         # Wait for all the threads to finish
         for thread in threads:
             thread.join()
+        # Search for eventual new characters page (in case of new Star Wars)
+        next_pages = [p['next_page'] for p in self.star_wars_characters if 'next_page' in p]
+        if None not in next_pages:
+            self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
     
@@ -129,6 +133,8 @@ class StarWarsCharactersData():
         @Param data_key: (optional) The key in the 'container' list where the data will be updated.
         """
         if index is None:
+            if 'next' in data:
+                data[result_key][0]['next_page'] = data["next"]
             container += data[result_key]
         else:
             container[index][data_key] = data[result_key]

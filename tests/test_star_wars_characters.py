@@ -54,6 +54,7 @@ def expected_csv_content():
 def luke_data():
     return {
         "name": "Luke Skywalker",
+        "next_page": "https://swapi.dev/api/people/?page=2",
         "height": "172",
         "mass": "77",
         "hair_color": "blond",
