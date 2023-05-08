@@ -46,6 +46,7 @@ You can run the program by executing these commands:
 ```bash
 docker run myapp python handler.py
 ```
+![alt text](/files/img/docker-process.png)
 
 ## Virtualenv
 ```bash
