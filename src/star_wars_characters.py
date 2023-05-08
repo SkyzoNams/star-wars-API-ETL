@@ -26,8 +26,7 @@ class StarWarsCharactersData():
             height = int(character["height"])  # Convert height to an integer if it is a string of digits
             
         # Get the number of films the character appears in
-        film_urls = character["films"]
-        appearances = len(film_urls)
+        appearances = len(character["films"])
 
         # Return a dictionary with the character's information
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
