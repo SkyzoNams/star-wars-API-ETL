@@ -16,7 +16,7 @@ git clone git@github.com:SkyzoNams/star-wars-API-ETL.git
 ```bash
 docker --version
 ```
-3.  Go inside the project root (/star-wars-API-ETL)
+3.  Go inside the project root
 ```bash
 cd /star-wars-API-ETL
 ```
@@ -28,8 +28,17 @@ docker build -t myapp .
 ## Virtualenv
 
 1.	Clone the repo
+```bash
+git clone git@github.com:SkyzoNams/star-wars-API-ETL.git
+```
 2.  Make sure to have Python 3 installed on your machine (developed with Python 3.7.8)
-3.  Go inside the project root (/star-wars-API-ETL)
+```bash
+which python
+```
+3.  Go inside the project root
+```bash
+cd /star-wars-API-ETL
+```
 4.  Create your local venv
 ```bash
 python3 -m venv ./venv
