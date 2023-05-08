@@ -24,7 +24,7 @@ def test_get_character_info_without_species_or_height(character, star_wars_chara
     expected_output = {
         "name": "Luke Skywalker",
         "species": "",
-        "height": 0,
+        "height": None,
         "appearances": 2
     }
     assert star_wars_characters_data.get_character_info(
@@ -36,7 +36,7 @@ def test_get_character_info_with_invalid_height(character, star_wars_characters_
     expected_output = {
         "name": "Luke Skywalker",
         "species": "Human",
-        "height": 0,
+        "height": None,
         "appearances": 2
     }
     assert star_wars_characters_data.get_character_info(

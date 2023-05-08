@@ -70,10 +70,8 @@ class StarWarsCharactersData():
         # Open the CSV file and create a DictWriter object with the specified fieldnames
         with open(filename, "w", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
             # Write the header row to the CSV file
             writer.writeheader()
-
             # Write each row of data to the CSV file
             for row in data:
                 writer.writerow(row)
