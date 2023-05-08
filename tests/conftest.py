@@ -1,5 +1,5 @@
 import pytest
-from src.star_wars_characters_processor import StarWarsDataProcessor
+from src.star_wars_data_processor import StarWarsDataProcessor
 
 @pytest.fixture()
 def character():
@@ -40,7 +40,7 @@ def characters():
 
 
 @pytest.fixture()
-def star_wars_characters_processor():
+def star_wars_data_processor():
     return StarWarsDataProcessor()
 
 

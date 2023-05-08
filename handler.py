@@ -1,4 +1,4 @@
-from src.star_wars_characters_processor import StarWarsDataProcessor
+from src.star_wars_data_processor import StarWarsDataProcessor
 import time
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
