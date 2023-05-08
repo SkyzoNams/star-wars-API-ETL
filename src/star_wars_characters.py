@@ -152,6 +152,7 @@ class StarWarsCharactersData():
         # Check if there are additional pages to search
         next_pages = [p['next_page'] for p in self.star_wars_characters if 'next_page' in p]
         if None not in next_pages:
+            logging.info('there are new characters to retrieve through the api!')
             # Recursive call to retrieve the next page
             self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")

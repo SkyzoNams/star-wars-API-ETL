@@ -1,6 +1,8 @@
 import pytest
 import os
 import requests
+import logging
+
 
 def test_get_character_info(character, star_wars_characters_data):
     expected_output = {
@@ -199,8 +201,9 @@ def test_create_and_send_csv(star_wars_characters_data, sample_csv_data):
 
 
 def test_retrieve_species_from_url_with_matching_species(star_wars_characters_data, sorted_characters, species):
-    expected_result = [{'name': 'Luke Skywalker', 'species': 'Human', 'appearances': 4, 'height': 164}, 
-                       {'name': 'Chewbacca','species': 'Wookiee', 'appearances': 6, 'height': 204},
+    expected_result = [{'name': 'Luke Skywalker', 'species': 'Human', 'appearances': 4, 'height': 164},
+                       {'name': 'Chewbacca', 'species': 'Wookiee',
+                           'appearances': 6, 'height': 204},
                        {'name': 'Darth Vader', 'species': 'Human', 'appearances': 6, 'height': 197}]
     star_wars_characters_data.species = species
     assert star_wars_characters_data.retrieve_species_from_url(
@@ -213,3 +216,55 @@ def test_retrieve_species_from_url_with_no_species(star_wars_characters_data, so
     star_wars_characters_data.species = species
     assert star_wars_characters_data.retrieve_species_from_url(
         sorted_characters) == sorted_characters
+
+
+def test_send_csv_file_to_server_logging(star_wars_characters_data, caplog, sample_csv_data):
+    filename = "./files/csv/test.csv"
+    fieldnames = ["name", "species", "height", "appearances"]
+    star_wars_characters_data.write_csv_file(
+        filename, fieldnames, sample_csv_data)
+    assert os.path.exists(filename)
+    # Call the function being tested
+    star_wars_characters_data.send_csv_file_to_server(
+        filename, "https://httpbin.org/post")
+    # Check that the expected logs were created
+    assert "root:star_wars_characters.py:78 csv file created ✓" in caplog.text
+    assert "root:star_wars_characters.py:88 sending the csv file to https://httpbin.org/post..." in caplog.text
+    assert "root:star_wars_characters.py:96 csv file sent to https://httpbin.org/post ✓" in caplog.text
+    os.remove(filename)
+
+
+def test_send_csv_file_to_server_logging_wrong_endpoint(star_wars_characters_data, caplog, sample_csv_data):
+    # Set up the test data
+    filename = "./files/csv/test.csv"
+    fieldnames = ["name", "species", "height", "appearances"]
+    star_wars_characters_data.write_csv_file(
+        filename, fieldnames, sample_csv_data)
+    assert os.path.exists(filename)
+
+    # Call the function being tested
+    try:
+        star_wars_characters_data.send_csv_file_to_server(
+            filename, "https://httpbin.org/")
+    except Exception:
+        pass
+
+    # Check that the error message was logged correctly
+    assert len(caplog.records) == 3
+    assert caplog.records[2].levelno == logging.ERROR
+    assert "the csv file has not been sent" in caplog.records[2].getMessage()
+
+
+def test_get_star_wars_api_page_warning_logging(caplog, star_wars_characters_data):
+    star_wars_characters_data.get_star_wars_api_page(
+        'https://swapi.dev/api/toto/?page=2')
+    assert caplog.records[0].levelno == logging.WARNING
+    assert "there is not data for the endpoint https://swapi.dev/api/toto/?page=2" in caplog.records[0].getMessage(
+    )
+
+
+def test_get_all_star_wars_characters_extra_characters_logging(star_wars_characters_data, caplog):
+    star_wars_characters_data.get_all_star_wars_characters(
+        starting_page=0, ending_page=1)
+    assert any(record.levelname ==
+               "INFO" and "there are new characters to retrieve through the api!" in record.message for record in caplog.records)
