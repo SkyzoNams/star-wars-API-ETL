@@ -36,6 +36,8 @@ class StarWarsCharactersData():
     def get_top_n_characters_by_appearances_and_height(self, characters: list, limit=10) -> list:
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films ordered by height.
+                 We also order by height here in case of the last items have equal appearances.
+        @Dev:    The -x in the lambda function is used to perform a descending sort on the values of the keys appearances and height. The minus sign - is used to negate the values of these keys.
         @Param: characters: list - A list of dictionaries containing information about the characters.
         @Param: limit: int - The number of items to sort and return.
         @Return: A list containing the top X characters who appear in the most films.
@@ -173,6 +175,7 @@ class StarWarsCharactersData():
                     
         # Wait for all threads to finish before exiting
         executor.shutdown(wait=True)
+        # Add the correct species to the right character
         characters = self.retrieve_species_from_url(characters)
         logging.info("the characters species have been retrieved from the api \x1b[32;20m✓\x1b[0m")
         return characters
@@ -208,10 +211,11 @@ class StarWarsCharactersData():
             # Get digestible information about the character
             characters_info.append(self.get_character_info(character))    
               
-        # Get the top 20 characters who appear in the most films
+        # Get the top 10 characters who appear in the most films
         top10_sorted_character = self.get_top_n_characters_by_appearances_and_height(characters_info, 10)
         # Sort the top 10 characters by height in descending order
         top10_sorted_character = self.sort_characters_by_height(top10_sorted_character)
+        # Retrieve the species for the top 10 characters
         top10_sorted_character = self.add_species_data_from_api(top10_sorted_character)
         return top10_sorted_character
 
