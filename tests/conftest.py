@@ -1,7 +1,6 @@
 import pytest
 from src.star_wars_characters import StarWarsCharactersData
 
-
 @pytest.fixture()
 def character():
     return {

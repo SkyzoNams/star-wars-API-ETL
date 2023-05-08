@@ -21,7 +21,7 @@ class StarWarsCharactersData():
             species = character["species"][0]
 
         # Get the character's height (if defined)
-        height = 0 # If height is not defined, set it to None
+        height = None # If height is not defined, set it to None
         if character["height"] and character["height"].isdigit():
             height = int(character["height"])  # Convert height to an integer if it is a string of digits
             
@@ -37,13 +37,14 @@ class StarWarsCharactersData():
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films ordered by height.
                  We also order by height here in case of the last items have equal appearances.
-        @Dev:    The -x in the lambda function is used to perform a descending sort on the values of the keys appearances and height. The minus sign - is used to negate the values of these keys.
+        @Dev:    The -x in the lambda function is used to perform a descending sort on the values of the keys appearances and height. 
+                 The minus sign - is used to negate the values of these keys.
         @Param: characters: list - A list of dictionaries containing information about the characters.
         @Param: limit: int - The number of items to sort and return.
         @Return: A list containing the top X characters who appear in the most films.
         """
-        # Sort the characters by the number of appearances (in descending order) and return the top 10
-        sorted_characters = sorted(characters, key=lambda x: (-x['appearances'], -x['height']))
+        # Sort the characters by the number of appearances in descending order, ordered by height
+        sorted_characters = sorted(filter(lambda x: x['height'] is not None, characters), key=lambda x: (-x['appearances'], -x['height']))
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
         return sorted_characters[:limit]
 
