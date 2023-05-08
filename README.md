@@ -120,9 +120,5 @@ deactivate && source venv/bin/activate
 
 **retrieve_species_from_url()** method: Retrieves the species name for each character in the input list of dictionaries by matching their species URL with the corresponding URL in the 'species' list.
 
-# Possible improvements
-- going deeper on tests
-- find a way to accelerate the API calls
-
 # Time spent on the test
-- 5-6 hours
+- 6 hours
