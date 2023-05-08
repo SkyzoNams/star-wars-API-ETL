@@ -199,8 +199,9 @@ def test_create_and_send_csv(star_wars_characters_data, sample_csv_data):
 
 
 def test_retrieve_species_from_url_with_matching_species(star_wars_characters_data, sorted_characters, species):
-    expected_result = [{'name': 'Luke Skywalker', 'species': 'Human', 'appearances': 4, 'height': 164}, {'name': 'Chewbacca',
-                                                                                                         'species': 'Wookiee', 'appearances': 6, 'height': 204}, {'name': 'Darth Vader', 'species': 'Human', 'appearances': 6, 'height': 197}]
+    expected_result = [{'name': 'Luke Skywalker', 'species': 'Human', 'appearances': 4, 'height': 164}, 
+                       {'name': 'Chewbacca','species': 'Wookiee', 'appearances': 6, 'height': 204},
+                       {'name': 'Darth Vader', 'species': 'Human', 'appearances': 6, 'height': 197}]
     star_wars_characters_data.species = species
     assert star_wars_characters_data.retrieve_species_from_url(
         sorted_characters) == expected_result
