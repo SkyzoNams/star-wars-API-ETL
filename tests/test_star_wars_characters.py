@@ -108,6 +108,7 @@ def species():
         {'name': 'Human', 'url': 'https://swapi.dev/api/species/1/'},
         {'name': 'Wookiee', 'url': 'https://swapi.dev/api/species/3/'}
     ]
+
 @pytest.fixture
 def eleven_characters():
     return [
@@ -214,7 +215,6 @@ def test_get_character_info_with_empty_films_list(character, star_wars_character
     }
     assert star_wars_characters_data.get_character_info(character) == expected_output
 
-
 def test_get_top_10_characters_returns_list(eleven_characters, star_wars_characters_data):
     assert isinstance(star_wars_characters_data.get_top_n_characters_by_appearances_and_height(eleven_characters), list)
 
@@ -259,7 +259,6 @@ def test_sort_characters_by_height(characters, star_wars_characters_data):
     sorted_characters = star_wars_characters_data.sort_characters_by_height(characters)
     assert sorted_characters[0]["name"] == "Darth Vader"
     assert sorted_characters[1]["name"] == "Luke Skywalker"
-    
 
 def test_write_csv_file_creates_file(sample_csv_data, star_wars_characters_data):
     filename = "./files/csv/test.csv"
