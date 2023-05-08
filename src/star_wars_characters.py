@@ -33,48 +33,17 @@ class StarWarsCharactersData():
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
 
 
-    def get_top_n_characters_by_appearances(self, characters: list, limit=10) -> list:
+    def get_top_n_characters_by_appearances_and_height(self, characters: list, limit=10) -> list:
         """
-        @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films.
+        @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films ordered by height.
         @Param: characters: list - A list of dictionaries containing information about the characters.
         @Param: limit: int - The number of items to sort and return.
         @Return: A list containing the top X characters who appear in the most films.
         """
         # Sort the characters by the number of appearances (in descending order) and return the top 10
-        sorted_characters = sorted(characters, key=lambda x: x["appearances"], reverse=True)[:limit] # this line is causing some inconsistency one every 100 test replaceing Ki-Adi-Mundi by Nute Gunray
+        sorted_characters = sorted(characters, key=lambda x: (-x['appearances'], -x['height']))
         logging.info("the ten characters with the most appearances have been sorted \x1b[32;20m✓\x1b[0m")
-        return sorted_characters
-
-    
-    def sort_tallest_first_when_equal_appearances_for_last_items(self, characters):
-        """        
-        @Notice: Keep only the tallest character for each number of appearances among the characters with the same number of appearances, from the 10th character on the list.
-        @Param characters: A list of dictionaries representing characters with their attributes.
-        @Return: The modified 'characters' list.
-        """
-        if len(characters) <= 10: # if there are less than 10 items in the list, return the original list
-            return characters
-        
-        appearances = characters[9]['appearances'] # Get the appearances of the 10th item in the list
-        # Calculate the number of items to keep by finding the first item from the 9th item and backwards with a different appearances value
-        items_number = 9 - next(i for i, c in enumerate(characters[8::-1]) if c['appearances'] != appearances)
-        # Filter the input list to only keep the characters with the same appearances value
-        list_with_same_appearances = [c for c in characters if c['appearances'] == appearances]
-        # Find the tallest character for this number of appearances among the characters with the same number of appearances
-        tallest_with_same_appearances = [
-            sorted([c for c in list_with_same_appearances if c['appearances'] == n], key=lambda x: x['height'], reverse=True)[:items_number]
-            for n in set(c['appearances'] for c in list_with_same_appearances)
-        ]
-
-        # Replace the original list's last characters with the tallest characters of the same appearances.
-        index = 0
-        while items_number <= 9:
-            characters[items_number] = tallest_with_same_appearances[0][index]
-            items_number += 1
-            index += 1
-
-        logging.info("we found and kept the tallest character with " + str(appearances) + " appearances \x1b[32;20m✓\x1b[0m")
-        return characters
+        return sorted_characters[:limit]
 
 
     def sort_characters_by_height(self, characters: list) -> list:
@@ -116,7 +85,7 @@ class StarWarsCharactersData():
                 server_url: str - The URL of the server endpoint to send the file to.
         @Return: The post method response
         """
-        logging.info("sending the csv file to + " + server_url + "...")
+        logging.info("sending the csv file to " + server_url + "...")
         # Open the CSV file in binary mode and create a dictionary with the file contents
         with open(filename, "rb") as csvfile:
             files = {"file": csvfile}
@@ -240,11 +209,9 @@ class StarWarsCharactersData():
             characters_info.append(self.get_character_info(character))    
               
         # Get the top 20 characters who appear in the most films
-        top_20_characters = self.get_top_n_characters_by_appearances(characters_info, 20)
-        # Keep only in the list the tallest character when there is equal appearances (only for the last items)
-        top_20_characters = self.sort_tallest_first_when_equal_appearances_for_last_items(top_20_characters)  
+        top10_sorted_character = self.get_top_n_characters_by_appearances_and_height(characters_info, 10)
         # Sort the top 10 characters by height in descending order
-        top10_sorted_character = self.sort_characters_by_height(top_20_characters[:10]) # Only sort the 10 first
+        top10_sorted_character = self.sort_characters_by_height(top10_sorted_character)
         top10_sorted_character = self.add_species_data_from_api(top10_sorted_character)
         return top10_sorted_character
 

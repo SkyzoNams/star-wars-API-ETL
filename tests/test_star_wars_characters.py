@@ -179,6 +179,10 @@ def eleven_characters():
     }
 ]
 
+def test_star_wars_characters_data_init(star_wars_characters_data):
+    assert star_wars_characters_data.star_wars_characters == []
+    assert star_wars_characters_data.species == []
+    
 def test_get_character_info_without_species_or_height(character, star_wars_characters_data):
     character["species"] = None
     character["height"] = None
@@ -211,21 +215,15 @@ def test_get_character_info_with_empty_films_list(character, star_wars_character
     assert star_wars_characters_data.get_character_info(character) == expected_output
 
 
-def test_get_top_10_characters_returns_list(characters, star_wars_characters_data):
-    for character in characters:
-        character['appearances'] = len(character['films'])
-    assert isinstance(star_wars_characters_data.get_top_n_characters_by_appearances(characters), list)
+def test_get_top_10_characters_returns_list(eleven_characters, star_wars_characters_data):
+    assert isinstance(star_wars_characters_data.get_top_n_characters_by_appearances_and_height(eleven_characters), list)
 
-def test_get_top_10_characters_returns_10_characters(characters, star_wars_characters_data):
-    for character in characters:
-        character['appearances'] = len(character['films'])
-    assert len(star_wars_characters_data.get_top_n_characters_by_appearances(characters)) == 10
+def test_get_top_10_characters_returns_10_characters(eleven_characters, star_wars_characters_data):
+    assert len(star_wars_characters_data.get_top_n_characters_by_appearances_and_height(eleven_characters)) == 10
 
-def test_get_top_10_characters_returns_correct_order(characters, star_wars_characters_data):
-    expected_order = ['Luke Skywalker', 'Darth Vader', 'Chewbacca', 'Leia Organa', 'Han Solo', 'Count Dooku', 'Yoda', 'Obi-Wan Kenobi', 'Anakin Skywalker', 'Mace Windu']
-    for character in characters:
-        character['appearances'] = len(character['films'])
-    assert [c["name"] for c in star_wars_characters_data.get_top_n_characters_by_appearances(characters)] == expected_order
+def test_get_top_10_characters_returns_correct_order(eleven_characters, star_wars_characters_data):
+    expected_order = ["Obi-Wan Kenobi", "C-3PO", "R2-D2", "Palpatine", "Yoda", "Chewbacca", "Darth Vader", "Luke Skywalker", "Leia Organa", "Ki-Adi-Mundi"]
+    assert [c["name"] for c in star_wars_characters_data.get_top_n_characters_by_appearances_and_height(eleven_characters)] == expected_order
 
 def test_sort_characters_by_height(characters, star_wars_characters_data):
     # Test sorting characters by height in descending order
@@ -347,42 +345,3 @@ def test_retrieve_species_from_url_with_no_species(star_wars_characters_data, so
         character['species'] = ""
     star_wars_characters_data.species = species
     assert star_wars_characters_data.retrieve_species_from_url(sorted_characters) == sorted_characters
-
-def test_sort_tallest_first_when_equal_appearances_for_last_items_changes_list_in_place(star_wars_characters_data, sorted_characters):
-    original_characters = sorted_characters.copy()
-    star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(sorted_characters)
-    assert characters != original_characters
-
-def test_sort_tallest_first_when_equal_appearances_for_last_items_keeps_tallest_for_each_appearance(star_wars_characters_data, sorted_characters):
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(sorted_characters)
-    assert result[0]["height"] == 164 # Only character with 10 appearances
-    assert result[1]["height"] == 204 # Only character with 9 appearances
-    assert result[2]["height"] == 197 # Only character with 8 appearances
-
-def test_sort_tallest_first_when_equal_appearances(star_wars_characters_data, eleven_characters):
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(eleven_characters)
-    assert result[-1]['height'] == 196 # There is a character with 10 appearances and height 160, but it is not the tallest, so it should not appear in the result.
-
-def test_keep_only_tallest_when_list_lower_than_10_items(star_wars_characters_data, sorted_characters):
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(sorted_characters)
-    assert result == sorted_characters
-
-def test_sort_tallest_first_when_equal_appearances_for_last_items_returns_same_list_if_no_equal_appearances(star_wars_characters_data, sorted_characters):
-    original_characters = sorted_characters.copy()
-    appearances = 1
-    for c in sorted_characters:
-        c["appearances"] = appearances
-        appearances += 1
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(sorted_characters)
-    assert result == original_characters
-
-def test_sort_tallest_first_when_equal_appearances_for_last_items_returns_same_list_if_only_one_appearance(star_wars_characters_data, sorted_characters):
-    original_characters = sorted_characters.copy()
-    for c in sorted_characters:
-        c["appearances"] = 1
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items(sorted_characters)
-    assert result == original_characters
-
-def test_sort_tallest_first_when_equal_appearances_for_last_items_returns_empty_list_if_input_empty(star_wars_characters_data):
-    result = star_wars_characters_data.sort_tallest_first_when_equal_appearances_for_last_items([])
-    assert result == []

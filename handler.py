@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
 
 def main():
-    try:
+    try:        
         start = time.time()
         st_data = StarWarsCharactersData() # create an instance of StarWarsCharactersData
         sorted_top10_characters = st_data.sort_top10_characters_by_height() # retrieve the ten characters who appear in the most Star Wars films, sorted by height
