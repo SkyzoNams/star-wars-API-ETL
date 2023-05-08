@@ -16,7 +16,7 @@ This program has been implemented to work if new Star Wars films are .
 docker build -t myapp .
 ```
 
-## virtualenv
+## Virtualenv
 
 1.	Clone the repo
 2.  Make sure to have Python 3 installed on your machine (developed with Python 3.7.8)
