@@ -1,16 +1,25 @@
 # Overview
-The purpose of this exercise is to find the ten characters who appear in the most Star Wars films and to sort those ten characters by height in descending order (i.e.
-tallest first). Then, a CSV with the following columns: name, species, height, appearances will be send to httpbin.org
 
-This program has been implemented to work if new Star Wars films are .
+This program extracts information about Star Wars characters from the SWAPI API, creates a CSV file with data on the top 10 characters who appear in the most films, sorted by height in descending order and then, send the csv file to https://httpbin.org/post. 
+
+This program has been implemented to work if new Star Wars films are created in the future.
 
 # Getting started 
 
 ## Docker
 
 1.	Clone the repo
-2.  Make sure to have Docker installed on your machine
+```bash
+git clone git@github.com:SkyzoNams/star-wars-API-ETL.git
+```
+2.  Make sure to have Docker installed on your machine, if it is, this command should return the installed version on your machine
+```bash
+docker --version
+```
 3.  Go inside the project root (/star-wars-API-ETL)
+```bash
+cd /star-wars-API-ETL
+```
 4.  Build the docker application
 ```bash
 docker build -t myapp .
@@ -94,31 +103,29 @@ deactivate && source venv/bin/activate
 
 # Functions
 
-**StarWarsCharactersData** class: This class contains several methods that extract, process, and output Star Wars character data.
+## Data extraction
+**get_all_star_wars_chracters()** method: This method gets information about all the Star Wars characters using the SWAPI API.
 
+**get_star_wars_api_page()** method: This method takes a URL for a page of character data from the SWAPI API and returns the JSON data for that page.
+
+## Data processing
 **get_character_info()** method: This method takes a character dictionary and returns a dictionary with the character's name, species, height, and number of appearances.
 
 **get_top_n_characters_by_appearances_and_height()** method: This method takes a list of character dictionaries and returns the top 10 characters who appear in the most films ordered by height.
 
 **sort_characters_by_height()** method: This method takes a list of character dictionaries and sorts them by height in descending order.
 
+## Data output
 **write_csv_file()** method: This method takes a filename, a list of fieldnames, and a list of dictionaries containing data, and writes the data to a CSV file.
 
 **send_csv_file_to_server()** method: This method takes a filename and a server URL, reads the CSV file, and sends it to the server using the requests library.
 
-**get_all_star_wars_chracters()** method: This method gets information about all the Star Wars characters using the SWAPI API.
+## Main function
+**sort_top10_characters_by_height()** method: This method is the main method that runs the project. It calls the get_all_star_wars_chracters() method to get information about all the Star Wars characters using the SWAPI API. It then calls the get_character_info() method to get information about each character and adds that information to a list.
 
-**get_star_wars_api_page()** method: This method takes a URL for a page of character data from the SWAPI API and returns the JSON data for that page.
+Next, it calls the **get_top_10_characters()** method to get the top 10 characters who appear in the most films.
 
-**add_species_data_from_api()** method: This method adds the species data to the sorted character list.
-
-**agregate_api_results()** method: This method aggregates API results into a container.
-
-**sort_top10_characters_by_height()** method: This method sorts the top 10 Star Wars characters who appear in the most films by height in descending order.
-
-**create_and_send_csv()** method: This method creates a CSV file in the /files folder and sends it to a server using the send_csv_file_to_server() method.
-
-**retrieve_species_from_url()** method: Retrieves the species name for each character in the input list of dictionaries by matching their species URL with the corresponding URL in the 'species' list.
+Finally, it calls the **sort_characters_by_height()** method to sort those characters by height in descending order, adds the species data to the sorted character list with the **add_species_data()** method, creates a CSV **file with the create_and_send_csv()** method, and sends that file to a server with the **send_csv_file_to_server()** method.
 
 # Time spent on the test
 - 6 hours
