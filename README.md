@@ -49,7 +49,7 @@ docker run myapp python handler.py
 python handler.py
 ```
 
-![alt text](/files/img/process.png)
+![alt text](/files/img/process2.png)
 
 
 # How it works
