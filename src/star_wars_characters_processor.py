@@ -3,13 +3,15 @@ import requests
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
 import concurrent.futures
+from typing import Union
+from requests import Response
 
-class StarWarsCharactersData():
+class StarWarsDataProcessor():
     def __init__(self):
         self.star_wars_characters = []
         self.species = []
         
-    def get_character_info(self, character: list) -> dict:
+    def get_character_info(self, character: dict) -> dict:
         """
         @Notice: Takes a character dictionary and returns a dictionary with the character's name, species, height, and number of appearances.
         @Param: character: dictionary - A dictionary containing information about a character.
@@ -32,7 +34,7 @@ class StarWarsCharactersData():
         return {"name": character["name"], "species": species, "height": height, "appearances": appearances}
 
 
-    def get_top_n_characters_by_appearances_and_height(self, characters: list, limit=10) -> list:
+    def get_top_n_characters_by_appearances_and_height(self, characters: list, limit: int=10) -> list:
         """
         @Notice: Takes a list of character dictionaries and returns the top 10 characters who appear in the most films ordered by height.
                  We also order by height here in case of the last items have equal appearances.
@@ -60,7 +62,7 @@ class StarWarsCharactersData():
         return sorted_characters
 
 
-    def write_csv_file(self, filename: str, fieldnames: list, data: list):
+    def write_csv_file(self, filename: str, fieldnames: list, data: list) -> None:
         """
         @Notice: Takes a filename, a list of fieldnames, and a list of dictionaries containing data, and writes the data to a CSV file.
         @Param: filename: str - The name of the CSV file to be created.
@@ -78,7 +80,7 @@ class StarWarsCharactersData():
         logging.info("csv file created \x1b[32;20m✓\x1b[0m")
 
 
-    def send_csv_file_to_server(self, filename: str, server_url: str):
+    def send_csv_file_to_server(self, filename: str, server_url: str) -> Response:
         """
         @Dev: This method sends a CSV file to a server endpoint via POST method
         @Param: filename: str - The name of the CSV file to be sent.
@@ -100,7 +102,7 @@ class StarWarsCharactersData():
         return response
             
     
-    def agregate_api_results(self, data: dict, container, api_endpoint: str):
+    def agregate_api_results(self, data: dict, container: Union[list, dict], api_endpoint: str) -> None:
         """
         @Notice: This function aggregates API results into a container by extracting the 'result_key' from the 'data' and 
                 appending it to 'container' or updating it at a specific 'index' and 'data_key'.
@@ -116,7 +118,7 @@ class StarWarsCharactersData():
             container.append(data)
 
 
-    def get_star_wars_api_page(self, url: str) -> dict:
+    def get_star_wars_api_page(self, url: str) -> None:
         """
         @Notice: This method retrieves a page of Star Wars characters from the SWAPI API. 
         @Param: url: str - The URL of the page to be retrieved from the API. 
@@ -130,8 +132,7 @@ class StarWarsCharactersData():
         else:
             logging.warning("\033[33m"+ "there is not data for the endpoint " + url + "\033[0m")
 
-
-    def get_all_star_wars_characters(self, starting_page=0, ending_page=9):
+    def get_all_star_wars_characters(self, starting_page: int=0, ending_page: int=9) -> None:
         """
         @Notice: This function retrieves Star Wars character data from an API by calling a separate function, get_star_wars_api_page, and aggregates the results.
         @Param starting_page: int, optional. The page number to start the search from.
@@ -158,7 +159,7 @@ class StarWarsCharactersData():
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
 
-    def add_species_data_from_api(self, characters: list):
+    def add_species_data_from_api(self, characters: list) -> list:
         """
         @Notice: This function retrieves Star Wars character species data from an API by calling a separate function, get_star_wars_api_page, and adds it to the provided list of sorted characters.
         @Param sorted_characters: list. The list of characters to add species data to.
@@ -180,7 +181,7 @@ class StarWarsCharactersData():
         return characters
 
 
-    def retrieve_species_from_url(self, sorted_characters):
+    def retrieve_species_from_url(self, sorted_characters: list) -> list: 
         """
         @Notice Retrieves the species name for each character in the input list of dictionaries by matching their species URL 
         with the corresponding URL in the 'species' list.
@@ -219,7 +220,7 @@ class StarWarsCharactersData():
         return top10_sorted_character
 
 
-    def create_and_send_csv(self, sorted_characters: list):
+    def create_and_send_csv(self, sorted_characters: list) -> None:
         """
         @Notice: This method creates a CSV file into the /files folder and send it by executing the send_csv_file_to_server() method. 
         @Param: sorted_characters: list - A list of Star Wars characters to be included in the CSV file. 
