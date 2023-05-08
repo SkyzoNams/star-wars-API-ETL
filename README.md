@@ -4,7 +4,10 @@ tallest first). Then, a CSV with the following columns: name, species, height, a
 
 This program has been implemented to work if new Star Wars films are .
 
-# Getting started with Docker
+# Getting started 
+
+## Docker
+
 1.	Clone the repo
 2.  Make sure to have Docker installed on your machine
 3.  Go inside the project root (/star-wars-API-ETL)
@@ -13,7 +16,7 @@ This program has been implemented to work if new Star Wars films are .
 docker build -t myapp .
 ```
 
-# Getting started with virtualenv
+## virtualenv
 
 1.	Clone the repo
 2.  Make sure to have Python 3 installed on your machine (developed with Python 3.7.8)
