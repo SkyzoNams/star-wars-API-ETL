@@ -1,6 +1,6 @@
 # Overview
 
-This program extracts information about Star Wars characters from the SWAPI API, creates a CSV file with data on the top 10 characters who appear in the most films, sorted by height in descending order and then, send the csv file to https://httpbin.org/post. 
+This program extracts information about Star Wars characters from the SWAPI API, creates a CSV file with data on the top 10 characters who appear in the most films, sorted by height in descending order and then, send the CSV file to https://httpbin.org/post. 
 
 This program has been implemented to work if new Star Wars films are created in the future.
 
@@ -18,7 +18,7 @@ docker --version
 ```
 3.  Go inside the project root
 ```bash
-cd /star-wars-API-ETL
+cd ./star-wars-API-ETL
 ```
 4.  Build the docker application
 ```bash
@@ -37,7 +37,7 @@ which python
 ```
 3.  Go inside the project root
 ```bash
-cd /star-wars-API-ETL
+cd ./star-wars-API-ETL
 ```
 4.  Create your local venv
 ```bash
