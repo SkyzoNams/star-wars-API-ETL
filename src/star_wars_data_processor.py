@@ -167,7 +167,7 @@ class StarWarsDataProcessor():
         logging.info('searching for Star Wars characters species through the api...')
         with concurrent.futures.ThreadPoolExecutor() as executor:
             for character in characters:
-                if character['species'] != "":
+                if character['species']:
                     # Submit the API request to a thread pool
                     future = executor.submit(self.get_star_wars_api_page, character['species'])
                     # Add a callback to aggregate the results
