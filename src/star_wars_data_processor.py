@@ -140,14 +140,14 @@ class StarWarsDataProcessor():
         """
         logging.info('searching for Star Wars characters data through the api...')
         url = "https://swapi.dev/api/people/?page="
-        page = starting_page
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            while page < ending_page:
+            while starting_page < ending_page:
                 # Submit the API request to a thread pool
-                future = executor.submit(self.get_star_wars_api_page, url + str(page + 1))
+                future = executor.submit(self.get_star_wars_api_page, url + str(starting_page + 1))
                 # Add a callback to aggregate the results
                 future.add_done_callback(lambda f: self.agregate_api_results(f.result(), self.star_wars_characters, "people"))
-                page += 1
+                starting_page += 1
+                
         # Wait for all threads to finish before exiting
         executor.shutdown(wait=True)
         # Check if there are additional pages to search
@@ -155,7 +155,7 @@ class StarWarsDataProcessor():
         if None not in next_pages:
             logging.info('there are new characters to retrieve through the api!')
             # Recursive call to retrieve the next page
-            self.get_all_star_wars_characters(starting_page=page, ending_page=page + 1)
+            self.get_all_star_wars_characters(starting_page=starting_page, ending_page=starting_page + 1)
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
 
 
@@ -209,7 +209,7 @@ class StarWarsDataProcessor():
         characters_info = []
         for character in self.star_wars_characters:
             # Get digestible information about the character
-            characters_info.append(self.get_character_info(character))    
+            characters_info.append(self.get_character_info(character))
               
         # Get the top 10 characters who appear in the most films
         top10_sorted_character = self.get_top_n_characters_by_appearances_and_height(characters_info, 10)
