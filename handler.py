@@ -2,11 +2,14 @@ from src.star_wars_data_processor import StarWarsDataProcessor
 import time
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
+import argparse
+parser = argparse.ArgumentParser(description='Star Wars characters processs')
+parser.add_argument('-opti', dest='optimized', help='a cache optimization', required=False)
 
 def main():
-    try:        
+    try:
         start = time.time()
-        st_data = StarWarsDataProcessor() # create an instance of StarWarsDataProcessor
+        st_data = StarWarsDataProcessor(parser.parse_args().optimized) # create an instance of StarWarsDataProcessor
         sorted_top10_characters = st_data.sort_top10_characters_by_height() # retrieve the ten characters who appear in the most Star Wars films, sorted by height
         st_data.create_and_send_csv(sorted_top10_characters) # create a csv file and send it to https://httpbin.org/post
         end = round(time.time() - start, 4)

@@ -3,13 +3,26 @@ import requests
 import logging
 logging.basicConfig(format="%(asctime)s: %(levelname)s - %(message)s", level=logging.INFO)
 import concurrent.futures
-from typing import Union
+from typing import Union, Tuple
 from requests import Response
+import os
+from src.utils import write_file, read_from_file
+import math
 
 class StarWarsDataProcessor():
-    def __init__(self):
+    def __init__(self, optimized=None):
         self.star_wars_characters = []
         self.species = []
+        self.optimized = optimized
+        self.cache_filpath = "./files/cache/cache.json"
+        self.cache = None
+        self.session = requests.Session()
+    
+    def __del__(self):
+        """
+        @Notice: This function is the destructor method of the class. It closes the requests session.
+        """
+        self.session.close()
         
     def get_character_info(self, character: dict) -> dict:
         """
@@ -92,7 +105,7 @@ class StarWarsDataProcessor():
         with open(filename, "rb") as csvfile:
             files = {"file": csvfile}
             # Send the file to the server using the requests library
-            response = requests.post(server_url, files=files)
+            response = self.session.post(server_url, files=files)
             try:
                 response.raise_for_status()
                 logging.info("csv file sent to " + server_url + " \x1b[32;20m✓\x1b[0m")
@@ -123,7 +136,7 @@ class StarWarsDataProcessor():
         @Notice: This method retrieves a page of Star Wars characters from the SWAPI API. 
         @Param: url: str - The URL of the page to be retrieved from the API. 
         """
-        response = requests.get(url)
+        response = self.session.get(url)
         # Check if the request was successful (status code 200 means success)
         if response.status_code == 200:
             # Get the JSON data from the response
@@ -132,14 +145,18 @@ class StarWarsDataProcessor():
         else:
             logging.warning("\033[33m"+ "there is not data for the endpoint " + url + "\033[0m")
 
-    def get_all_star_wars_characters(self, starting_page: int=0, ending_page: int=9) -> None:
+
+    def get_all_star_wars_characters(self, starting_page: int=0, ending_page: int=9) -> int:
         """
         @Notice: This function retrieves Star Wars character data from an API by calling a separate function, get_star_wars_api_page, and aggregates the results.
         @Param starting_page: int, optional. The page number to start the search from.
         @Param ending_page: int, optional. The page number to end the search at.
+        @Return: the ending page value
         """
         logging.info('searching for Star Wars characters data through the api...')
         url = "https://swapi.dev/api/people/?page="
+        if self.optimized:
+            starting_page, ending_page = self.get_cached_result()
         with concurrent.futures.ThreadPoolExecutor() as executor:
             while starting_page < ending_page:
                 # Submit the API request to a thread pool
@@ -147,7 +164,7 @@ class StarWarsDataProcessor():
                 # Add a callback to aggregate the results
                 future.add_done_callback(lambda f: self.agregate_api_results(f.result(), self.star_wars_characters, "people"))
                 starting_page += 1
-                
+
         # Wait for all threads to finish before exiting
         executor.shutdown(wait=True)
         # Check if there are additional pages to search
@@ -155,9 +172,59 @@ class StarWarsDataProcessor():
         if None not in next_pages:
             logging.info('there are new characters to retrieve through the api!')
             # Recursive call to retrieve the next page
-            self.get_all_star_wars_characters(starting_page=starting_page, ending_page=starting_page + 1)
+            ending_page = self.get_all_star_wars_characters(starting_page=starting_page, ending_page=ending_page + 1)
+        if self.optimized:
+            self.write_cached_result(ending_page)
         logging.info("all the Star Wars characters have been retrieved from the api \x1b[32;20m✓\x1b[0m")
+        return ending_page
+    
+    
+    def get_cached_result(self) -> Tuple[int, int]:
+        """
+        @Notice: Retrieves the cached result or fetches the films information from the Star Wars API.
+        @Return: A tuple representing the starting page number and the ending page number for character search.
+        """
+        if not os.path.exists(self.cache_filpath):
+            return 0, 9  # No cached results available
+        
+        data = self.get_star_wars_api_page("https://swapi.dev/api/films/")  # Fetch the films information
+        self.get_cached_data()  # Retrieve the locally stored data from previous execution
+        pages_number = self.get_last_page_number_from_result(data["results"])  # Determine the number of pages
 
+        if pages_number == self.cache['last_page_number']:
+            self.star_wars_characters = self.cache['characters']
+            return self.cache["last_page_number"], self.cache["last_page_number"]  # Use the cached data
+        return 0, pages_number  # Start from page 0 up to the last known page number
+
+
+    def get_cached_data(self) -> None:
+        """
+        @Notice: Reads the cached data from the file and updates the 'cache' and 'star_wars_characters' attributes.
+        """
+        self.cache = read_from_file(self.cache_filpath)
+        self.star_wars_characters = self.cache["characters"]
+
+
+    def get_last_page_number_from_result(self, result: dict) -> int:
+        """
+        @Notice: Calculates the number of pages based on the unique characters in the result.
+        @Param: result - A dictionary containing the films information.
+        @Return: The last page number for character search.
+        """
+        unique_characters = set(character for film in result for character in film["characters"])
+        character_count = len(unique_characters)
+        return math.ceil(character_count / 10)  # Number of characters per page, rounded up
+
+
+    def write_cached_result(self, ending_page: int) -> None:
+        """
+        @Notice: Writes the cached result to the file if the cache is empty or the ending page is greater than the last page number.
+        @Param: ending_page - The ending page number for character search.
+        """
+        if self.cache is None or self.cache['last_page_number'] < ending_page:
+            write_file(self.cache_filpath, {"last_page_number": ending_page, "characters": self.star_wars_characters})
+
+        
 
     def add_species_data_from_api(self, characters: list) -> list:
         """

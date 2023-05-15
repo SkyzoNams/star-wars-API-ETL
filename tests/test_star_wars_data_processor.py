@@ -228,9 +228,9 @@ def test_send_csv_file_to_server_logging(star_wars_data_processor, caplog, sampl
     star_wars_data_processor.send_csv_file_to_server(
         filename, "https://httpbin.org/post")
     # Check that the expected logs were created
-    assert "root:star_wars_data_processor.py:80 csv file created ✓" in caplog.text
-    assert "root:star_wars_data_processor.py:90 sending the csv file to https://httpbin.org/post..." in caplog.text
-    assert "root:star_wars_data_processor.py:98 csv file sent to https://httpbin.org/post ✓" in caplog.text
+    assert "root:star_wars_data_processor.py:93 csv file created ✓" in caplog.text
+    assert "root:star_wars_data_processor.py:103 sending the csv file to https://httpbin.org/post..." in caplog.text
+    assert "root:star_wars_data_processor.py:111 csv file sent to https://httpbin.org/post ✓" in caplog.text
     os.remove(filename)
 
 
